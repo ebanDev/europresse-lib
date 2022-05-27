@@ -1,4 +1,4 @@
-# europresse-api
+# 📰 Europresse API
 📰 This repo is an API for europresse, featuring toutatice-based auth
 ## Usage
 1. Install dependencies
