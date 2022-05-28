@@ -7,7 +7,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support import expected_conditions as EC
 
 
-@routes.route('/auth', methods=['POST'])
+@routes.route('/auth', methods=['GET'])
 def auth():
     if request.form['auth-provider'] == "toutatice":
         return toutatice(request.form['username'], request.form['password'])
