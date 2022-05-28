@@ -3,4 +3,4 @@ from . import routes
 
 @routes.route('/version')
 def version():
-    return "2.0"
+    return "2.1"

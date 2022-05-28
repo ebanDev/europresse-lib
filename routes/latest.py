@@ -83,8 +83,8 @@ def latest():
         article['title'] = articleData.select(
             'div.docContent > div.content-wrapper > div.docLink.docList-body > a')[0].contents[0]
 
-        article['newspaper'] = articleData.select(
-            'div.docContent > div.docList-header > span.source-name')[0].contents[0]
+        article['summary'] = articleData.select(
+            'div.docContent > div.content-wrapper > div.docList-footer > .kwicResult.clearfix')[0].contents[-1][3:]
         article['articleId'] = articleData.select('#doc-name')[0].get('value')
         articles.append(article)
 
