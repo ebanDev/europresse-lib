@@ -5,7 +5,7 @@ import ast
 from bs4 import BeautifulSoup
 
 
-@routes.route('/article', methods=['GET'])
+@routes.route('/article', methods=['POST'])
 def article():
     cookies = ast.literal_eval(request.form['cookies'])
     article = request.form['article']
@@ -38,6 +38,7 @@ def article():
 
     response = requests.get('https://nouveau.europresse.com/Document/ViewMobile',
                             params=params, cookies=cookies, headers=headers)
+
     soup = BeautifulSoup(str(response.text), features="lxml")
 
     article = soup.find('div', {'class': 'docOcurrContainer'})
@@ -48,7 +49,11 @@ def article():
     for match in article.findAll('span'):
         match.unwrap()
 
-    articleContent = ""
+    articleTitle = soup.find('p', {'class': 'titreArticleVisu'})
+    for match in articleTitle.findAll('mark'):
+        match.unwrap()
+
+    articleContent = "<h1>" + articleTitle.get_text() + "</h1>"
     for p in article:
         articleContent += str(p)
 

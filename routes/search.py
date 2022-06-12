@@ -5,7 +5,7 @@ import ast
 from bs4 import BeautifulSoup
 
 
-@routes.route('/search', methods=['GET'])
+@routes.route('/search', methods=['POST'])
 def search():
     cookies = ast.literal_eval(request.form['cookies'])
     query = request.form['q']

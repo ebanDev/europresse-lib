@@ -15,7 +15,7 @@ newsPapers = {
 }
 
 
-@routes.route('/latest', methods=['GET'])
+@routes.route('/latest', methods=['POST'])
 def latest():
     cookies = ast.literal_eval(request.form['cookies'])
     newsPaper = newsPapers[request.form['q']]
