@@ -1,4 +1,2 @@
-.mypy_cache
-routes/__pycache__
-sendgrid.env
-toKindle.py
+npm/
+.idea
