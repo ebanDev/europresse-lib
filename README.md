@@ -2,6 +2,8 @@
 
 A TypeScript library for the Europresse API.
 
+*This project is not affiliated, associated, authorized, endorsed by, or in any way officially connected with the Europresse, or any of its subsidiaries or its affiliates. The name Europresse as well as related names, marks, emblems and images are registered trademarks of their respective owners.*
+
 ## Features
 
 - [x] Authentication
