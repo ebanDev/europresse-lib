@@ -1,6 +1,6 @@
 import {DOMParser, fetch, Node} from "../deps.ts";
 
-export async function search(cookieJar: string, query: string, searchIn = "fullText", dateRange = "allTime") {
+export async function search(cookieJar: string, query: string, searchIn = "fullText", dateRange = "allTime"): Promise<Array<{title: string, source: string, date: string, description: string, id: string}>> {
     const searchPageReq = await fetch(cookieJar, "https://nouveau.europresse.com/Search/Reading");
 
     const searchPageDom = new DOMParser().parseFromString(await searchPageReq.text(), "text/html")!;
@@ -62,7 +62,7 @@ export async function search(cookieJar: string, query: string, searchIn = "fullT
     const searchResultsDom = new DOMParser().parseFromString(await searchResultsReq.text(), "text/html")!;
     const searchResults = searchResultsDom.querySelectorAll(".docListItem")!;
 
-    const result = Array.from(searchResults).map((item: Node) => {
+    return Array.from(searchResults).map((item: Node) => {
         // @ts-ignore: deno-dom is not returning the correct type for querySelectorAll see https://github.com/b-fuze/deno-dom/issues/4
         const title = item.querySelector(".docList-links")?.textContent;
         // @ts-ignore: deno-dom is not returning the correct type for querySelectorAll see https://github.com/b-fuze/deno-dom/issues/4

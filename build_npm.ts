@@ -12,7 +12,7 @@ await build({
     },
     package: {
         name: "europresse-lib",
-        version: "1.1.0",
+        version: "1.1.1",
         description:
             "A library to search and fetch articles from Europresse",
         license: "AGPL-3.0",
