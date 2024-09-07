@@ -1,7 +1,13 @@
 import {DOMParser, fetch} from "../deps.ts";
 
-export async function article(cookieJar: string, id: string, outputType: string) {
-    const articleReq = await fetch(cookieJar, `https://nouveau.europresse.com/Document/ViewMobile?docKey=${encodeURI(id)}&fromBasket=false&viewEvent=1&invoiceCode=`);
+type AuthData = {
+  domain: string;
+  cookieJar: string;
+};
+
+export async function article(authData: AuthData, id: string, outputType: string) {
+
+    const articleReq = await fetch(authData.cookieJar, `https://${authData.domain}/Document/ViewMobile?docKey=${encodeURI(id)}&fromBasket=false&viewEvent=1&invoiceCode=`);
 
     const articleDom = new DOMParser().parseFromString(await articleReq.text(), "text/html")!;
 

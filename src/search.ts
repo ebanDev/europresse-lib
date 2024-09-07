@@ -1,7 +1,12 @@
 import {DOMParser, fetch, Node} from "../deps.ts";
 
-export async function search(cookieJar: string, query: string, searchIn = "fullText", dateRange = "allTime"): Promise<Array<{title: string, source: string, date: string, description: string, id: string}>> {
-    const searchPageReq = await fetch(cookieJar, "https://nouveau.europresse.com/Search/Reading");
+type AuthData = {
+    domain: string;
+    cookieJar: string;
+};  
+
+export async function search(authData: AuthData, query: string, searchIn = "fullText", dateRange = "allTime"): Promise<Array<{title: string, source: string, date: string, description: string, id: string}>> {
+    const searchPageReq = await fetch(authData.cookieJar, `https://${authData.domain}/Search/Reading`);
 
     const searchPageDom = new DOMParser().parseFromString(await searchPageReq.text(), "text/html")!;
     const requestVerificationToken = searchPageDom.querySelector("input[name=__RequestVerificationToken]")?.getAttribute("value")!;
@@ -49,7 +54,7 @@ export async function search(cookieJar: string, query: string, searchIn = "fullT
     params.append("CriteriaExp[1].CriteriaId", "1");
     params.append("__RequestVerificationToken", requestVerificationToken);
 
-    await fetch(cookieJar, "https://nouveau.europresse.com/Search/AdvancedMobile", {
+    await fetch(authData.cookieJar, `https://${authData.domain}/Search/AdvancedMobile`, {
         method: "POST",
         headers: {
             "Content-Type": "application/x-www-form-urlencoded"
@@ -57,7 +62,7 @@ export async function search(cookieJar: string, query: string, searchIn = "fullT
         body: params
     });
 
-    const searchResultsReq = await fetch(cookieJar, "https://nouveau.europresse.com/Search/GetPage?pageNo=0&docPerPage=50");
+    const searchResultsReq = await fetch(authData.cookieJar, `https://${authData.domain}/Search/GetPage?pageNo=0&docPerPage=50`);
 
     const searchResultsDom = new DOMParser().parseFromString(await searchResultsReq.text(), "text/html")!;
     const searchResults = searchResultsDom.querySelectorAll(".docListItem")!;
