@@ -9,7 +9,7 @@ export async function search(authData: AuthData, query: string, searchIn = "full
     const searchPageReq = await fetch(authData.cookieJar, `https://${authData.domain}/Search/Reading`);
 
     const searchPageDom = new DOMParser().parseFromString(await searchPageReq.text(), "text/html")!;
-    let requestVerificationToken = searchPageDom.querySelector("input[name=__RequestVerificationToken]")?.getAttribute("value")!;
+    const requestVerificationToken = searchPageDom.querySelector("input[name=__RequestVerificationToken]")?.getAttribute("value")!;
 
     const params = new URLSearchParams
     if (searchIn === "fullText") {
