@@ -5,11 +5,11 @@ type AuthData = {
     cookieJar: string;
 };  
 
-export async function search(authData: AuthData, query: string, searchIn = "fullText", dateRange = "allTime"): Promise<Array<{title: string, source: string, date: string, description: string, id: string}>> {
+export async function search(authData: AuthData, query: string, searchIn = "fullText", dateRange = "allTime", lang = ["Anglais", "Français"], sources = []): Promise<Array<{title: string, source: string, date: string, description: string, id: string}>> {
     const searchPageReq = await fetch(authData.cookieJar, `https://${authData.domain}/Search/Reading`);
 
     const searchPageDom = new DOMParser().parseFromString(await searchPageReq.text(), "text/html")!;
-    const requestVerificationToken = searchPageDom.querySelector("input[name=__RequestVerificationToken]")?.getAttribute("value")!;
+    let requestVerificationToken = searchPageDom.querySelector("input[name=__RequestVerificationToken]")?.getAttribute("value")!;
 
     const params = new URLSearchParams
     if (searchIn === "fullText") {
@@ -45,13 +45,23 @@ export async function search(authData: AuthData, query: string, searchIn = "full
     }
     params.append("DateFilter.DateStart", new Date().toISOString().slice(0, 10));
     params.append("DateFilter.DateStop", new Date().toISOString().slice(0, 10));
-    params.append("SourcesForm", "2");
-    params.append("CriteriaExp[0].OperatorId", "2");
-    params.append("CriteriaExp[0].CriteriaName", "Anglais");
-    params.append("CriteriaExp[0].CriteriaId", "2");
-    params.append("CriteriaExp[1].OperatorId", "2");
-    params.append("CriteriaExp[1].CriteriaName", "Français");
-    params.append("CriteriaExp[1].CriteriaId", "1");
+    if (sources.length > 0) {
+        params.append("SourcesForm", "1");
+        sources.forEach((source, index) => {
+            params.append(`CriteriaExp[${index}].CriteriaId`, source);
+            params.append(`CriteriaExp[${index}].OperatorId`, "2");
+        });
+    } else {
+        params.append("SourcesForm", "2");
+        if (lang.length > 0) {
+            lang.forEach((language, index) => {
+                params.append(`CriteriaExp[${index}].CriteriaName`, language);
+                params.append(`CriteriaExp[${index}].CriteriaId`, language === "Anglais" ? "2" : "1");
+                params.append(`CriteriaExp[${index}].OperatorId`, "2");
+            });
+        }
+    }
+    
     params.append("__RequestVerificationToken", requestVerificationToken);
 
     await fetch(authData.cookieJar, `https://${authData.domain}/Search/AdvancedMobile`, {
@@ -63,7 +73,6 @@ export async function search(authData: AuthData, query: string, searchIn = "full
     });
 
     const searchResultsReq = await fetch(authData.cookieJar, `https://${authData.domain}/Search/GetPage?pageNo=0&docPerPage=50`);
-
     const searchResultsDom = new DOMParser().parseFromString(await searchResultsReq.text(), "text/html")!;
     const searchResults = searchResultsDom.querySelectorAll(".docListItem")!;
 
