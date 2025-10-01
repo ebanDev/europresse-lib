@@ -72,22 +72,35 @@ export async function search(authData: AuthData, query: string, searchIn = "full
         body: params
     });
 
-    const searchResultsReq = await fetch(authData.cookieJar, `https://${authData.domain}/Search/GetPage?pageNo=0&docPerPage=50`);
-    const searchResultsDom = new DOMParser().parseFromString(await searchResultsReq.text(), "text/html")!;
-    const searchResults = searchResultsDom.querySelectorAll(".docListItem")!;
+    let allResults: Array<{title: string, source: string, date: string, description: string, id: string}> = [];
 
-    return Array.from(searchResults).map((item: Node) => {
-        // @ts-ignore: deno-dom is not returning the correct type for querySelectorAll see https://github.com/b-fuze/deno-dom/issues/4
-        const title = item.querySelector(".docList-links")?.textContent;
-        // @ts-ignore: deno-dom is not returning the correct type for querySelectorAll see https://github.com/b-fuze/deno-dom/issues/4
-        const source = item.querySelector(".source-name")?.textContent;
-        // @ts-ignore: deno-dom is not returning the correct type for querySelectorAll see https://github.com/b-fuze/deno-dom/issues/4
-        const date = item.querySelector(".details")?.textContent.split("•")[0].trim();
-        // @ts-ignore: deno-dom is not returning the correct type for querySelectorAll see https://github.com/b-fuze/deno-dom/issues/4
-        const description = item.querySelector(".kwicResult.clearfix")?.textContent.split('\n').slice(9).join('\n');
-        // @ts-ignore: deno-dom is not returning the correct type for querySelectorAll see https://github.com/b-fuze/deno-dom/issues/4
-        const id = item.querySelector("input#doc-name")?.getAttribute("value");
+    for (let pageNo = 0; pageNo <= 1000; pageNo++) {
+        const searchResultsReq = await fetch(authData.cookieJar, `https://${authData.domain}/Search/GetPage?pageNo=${pageNo}&docPerPage=50`);
+        const text = await searchResultsReq.text();
+        if (text.trim() === '') break;
 
-        return {title, source, date, description, id};
-    });
+        const searchResultsDom = new DOMParser().parseFromString(text, "text/html");
+        if (!searchResultsDom) break;
+
+        const searchResults = searchResultsDom.querySelectorAll(".docListItem")!;
+
+        const results = Array.from(searchResults).map((item: Node) => {
+            // @ts-ignore: deno-dom is not returning the correct type for querySelectorAll see https://github.com/b-fuze/deno-dom/issues/4
+            const title = item.querySelector(".docList-links")?.textContent;
+            // @ts-ignore: deno-dom is not returning the correct type for querySelectorAll see https://github.com/b-fuze/deno-dom/issues/4
+            const source = item.querySelector(".source-name")?.textContent;
+            // @ts-ignore: deno-dom is not returning the correct type for querySelectorAll see https://github.com/b-fuze/deno-dom/issues/4
+            const date = item.querySelector(".details")?.textContent.split("•")[0].trim();
+            // @ts-ignore: deno-dom is not returning the correct type for querySelectorAll see https://github.com/b-fuze/deno-dom/issues/4
+            const description = item.querySelector(".kwicResult.clearfix")?.textContent.split('\n').slice(9).join('\n');
+            // @ts-ignore: deno-dom is not returning the correct type for querySelectorAll see https://github.com/b-fuze/deno-dom/issues/4
+            const id = item.querySelector("input#doc-name")?.getAttribute("value");
+
+            return {title, source, date, description, id};
+        });
+
+        allResults.push(...results);
+    }
+
+    return allResults;
 }
